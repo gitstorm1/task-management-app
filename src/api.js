@@ -6,6 +6,11 @@ import * as database from './database.js';
 const apiRouter = express.Router();
 
 apiRouter.post('/login', async (req, res) => {
+    if (!req.body) {
+        res.status(400).send({ error: '' });
+        return;
+    }
+
     if (!req.body.email) {
         res.status(400).send({ error: 'Email missing' });
         return;
@@ -42,6 +47,11 @@ apiRouter.post('/login', async (req, res) => {
 });
 
 apiRouter.post('/signup', async (req, res) => {
+    if (!req.body) {
+        res.status(400).send({ error: '' });
+        return;
+    }
+
     if (!req.body.email) {
         res.status(400).send({ error: 'Email missing' });
         return;
@@ -75,6 +85,24 @@ apiRouter.post('/signup', async (req, res) => {
     }
 
     res.status(201).send({ message: 'Signup successful' });
+});
+
+apiRouter.post('/logout', (req, res) => {
+    if (!req.session.user) {
+        res.status(401).send({ error: 'Not logged in' });
+        return;
+    }
+
+    req.session.destroy((err) => {
+        if (err) {
+            console.error(err);
+            res.sendStatus(500);
+            return;
+        }
+        
+        res.clearCookie('connect.sid');
+        res.send({ message: 'Logout successful' });
+    });
 });
 
 export { apiRouter };

@@ -5,6 +5,15 @@ import app from '../src/app.js';
 
 describe('Authentication', (t) => {
     describe('Logging in', () => {
+        it('Should reject login for missing body', async () => {
+            const response = await request(app)
+                .post('/api/login')
+                .send();
+
+            assert.strictEqual(response.status, 400);
+            assert.strictEqual(response.body.error, '');
+        });
+
         it('Should reject login for valid email and incorrect password', async () => {
             const response = await request(app)
                 .post('/api/login')
@@ -91,6 +100,15 @@ describe('Authentication', (t) => {
             assert.strictEqual(response.body.error, 'Invalid password');
         });*/
 
+        it('Should reject signup for missing body', async () => {
+            const response = await request(app)
+                .post('/api/signup')
+                .send();
+
+            assert.strictEqual(response.status, 400);
+            assert.strictEqual(response.body.error, '');
+        });
+
         it('Should reject signup for invalid email', async () => {
             const response = await request(app)
                 .post('/api/signup')
@@ -137,6 +155,35 @@ describe('Authentication', (t) => {
 
             assert.strictEqual(response.status, 201);
             assert.strictEqual(response.body.message, 'Signup successful');
+        });
+    });
+
+    describe('Logging out', () => {
+        it('Should give an error if already logged out', async () => {
+            const response = await request(app)
+                .post('/api/logout')
+                .send();
+            
+            assert.strictEqual(response.status, 401);
+            assert.strictEqual(response.body.error, 'Not logged in');
+        });
+
+        it('Should logout successfully', async () => {
+            const agent = request.agent(app);
+
+            await agent
+                .post('/api/login')
+                .send({
+                    email: 'test@example.com',
+                    password: 'password',
+                });
+            
+            const response = await agent
+                .post('/api/logout')
+                .send();
+            
+            assert.strictEqual(response.status, 200);
+            assert.strictEqual(response.body.message, 'Logout successful');
         });
     });
 });
