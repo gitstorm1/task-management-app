@@ -1,7 +1,7 @@
 import express from 'express';
 import isEmail from 'validator/lib/isEmail.js';
 
-import * as database from './database.js';
+import * as database from './database/database.js';
 
 const apiRouter = express.Router();
 
