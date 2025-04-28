@@ -1,7 +1,12 @@
-import { describe, it } from 'node:test';
+import { after, afterEach, describe, it } from 'node:test';
 import assert from 'node:assert';
 import request from 'supertest';
+import knex from 'knex';
 import app from './app.js';
+
+import config from './database/knexfile.js';
+
+const db = knex(config.development);
 
 describe('Authentication', () => {
     describe('Logging in', () => {
@@ -99,6 +104,11 @@ describe('Authentication', () => {
             assert.strictEqual(response.status, 401);
             assert.strictEqual(response.body.error, 'Invalid password');
         });*/
+
+        afterEach(async () => {
+            await db('users')
+                .truncate();
+        });
 
         it('Should reject signup for missing body', async () => {
             const response = await request(app)
